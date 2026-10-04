@@ -1,0 +1,1014 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elim-AI — подбор санатория по медицинским показаниям</title>
+<meta name="description" content="Демо-прототип сервиса подбора санаториев Казахстана по медицинским показаниям">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230E5E6F'/%3E%3Cpath d='M16 6v6M16 20v6M6 16h6M20 16h6' stroke='white' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@500;600;700&amp;family=Golos+Text:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F2F6F7}
+a{color:#0E5E6F}a:hover{color:#0F2A33}
+.lnk{background:none;border:0;padding:10px 4px;min-height:44px;font:500 15px 'Golos Text',sans-serif;color:#22383F;cursor:pointer}
+.lnk:hover{color:#0E5E6F}
+.lnk-on{color:#0E5E6F;font-weight:600}
+.chip{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border-radius:999px;border:1px solid #C5D4D8;background:#FFFFFF;color:#0F2A33;font:500 15px 'Golos Text',sans-serif;cursor:pointer;text-align:left}
+.chip:hover{border-color:#0E5E6F}
+.chip-on{background:#0E5E6F;color:#FFFFFF;border-color:#0E5E6F}
+.chip-sm{min-height:38px;padding:0 14px;font-size:14px}
+.opt{display:flex;gap:14px;align-items:flex-start;width:100%;padding:16px 18px;border-radius:14px;border:1px solid #C5D4D8;background:#FFFFFF;cursor:pointer;text-align:left;font:400 15px 'Golos Text',sans-serif;color:#0F2A33;box-sizing:border-box}
+.opt:hover{border-color:#0E5E6F}
+.opt-on{border:2px solid #0E5E6F;padding:15px 17px;background:#E6F0F2}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 22px;border-radius:12px;border:0;background:#0E5E6F;color:#FFFFFF;font:600 16px 'Golos Text',sans-serif;cursor:pointer}
+.btn:hover{background:#0A4855}
+.btn-off{background:#A7B9BE;cursor:not-allowed}
+.btn-off:hover{background:#A7B9BE}
+.btn2{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:48px;padding:0 20px;border-radius:12px;border:1px solid #0E5E6F;background:transparent;color:#0E5E6F;font:600 16px 'Golos Text',sans-serif;cursor:pointer}
+.btn2:hover{background:#E6F0F2}
+.tab{background:none;border:0;border-bottom:2px solid transparent;min-height:48px;padding:0 4px;font:500 16px 'Golos Text',sans-serif;color:#4A5F66;cursor:pointer}
+.tab-on{border-bottom-color:#0E5E6F;color:#0F2A33;font-weight:600}
+.card{transition:box-shadow .15s,transform .15s}
+.card:hover{box-shadow:0 10px 30px rgba(15,42,51,.10);transform:translateY(-2px)}
+.cardbtn{all:unset;display:block;cursor:pointer;width:100%;box-sizing:border-box}
+.cardbtn:focus-visible{outline:2px solid #0E5E6F;outline-offset:4px;border-radius:18px}
+.field{display:flex;flex-direction:column;gap:6px;flex:1 1 180px;min-width:0}
+.field label{font:500 13px 'Golos Text',sans-serif;color:#4A5F66}
+.field select,.field input{min-height:48px;border-radius:10px;border:1px solid #C5D4D8;background:#FFFFFF;padding:0 14px;font:400 16px 'Golos Text',sans-serif;color:#0F2A33;box-sizing:border-box;width:100%}
+.step{width:36px;height:36px;border-radius:999px;border:1px solid #C5D4D8;background:#FFFFFF;font:600 18px 'Golos Text',sans-serif;color:#0F2A33;cursor:pointer}
+.lang{min-height:36px;min-width:44px;padding:0 10px;border:0;border-radius:8px;background:transparent;font:600 14px 'Golos Text',sans-serif;color:#4A5F66;cursor:pointer}
+.lang-on{background:#0F2A33;color:#FFFFFF}
+.left-low{font-size:13px;font-weight:600;color:#8A4A12}
+.left-ok{font-size:13px;font-weight:500;color:#0E5E6F}
+.dot{width:14px;height:14px;border-radius:999px;flex:none;margin-top:4px;box-sizing:border-box}
+.dot-done{background:#0E5E6F}
+.dot-now{background:#FFFFFF;border:4px solid #C2702A}
+.dot-next{background:#FFFFFF;border:2px solid #A7B9BE}
+.slot{min-height:44px;padding:0 16px;border-radius:10px;border:1px solid #C5D4D8;background:#FFFFFF;font:500 15px 'Golos Text',sans-serif;color:#0F2A33;cursor:pointer}
+.slot-on{background:#0E5E6F;border-color:#0E5E6F;color:#FFFFFF}
+.slot-off{color:#9AAAAF;background:#F2F6F7;text-decoration:line-through;cursor:not-allowed}
+.box,.rad{width:22px;height:22px;flex:none;box-sizing:border-box;border:2px solid #8FA6AC;background:#FFFFFF;display:flex;align-items:center;justify-content:center;font:700 14px 'Golos Text',sans-serif;color:#FFFFFF}
+.box{border-radius:6px}.rad{border-radius:999px;font-size:0}
+.box-on{background:#0E5E6F;border-color:#0E5E6F}
+.rad-on{border:7px solid #0E5E6F}
+.typing span{display:inline-block;width:8px;height:8px;border-radius:999px;background:#7C9399;margin-right:4px;animation:blink 1s infinite}
+.typing span:nth-child(2){animation-delay:.15s}.typing span:nth-child(3){animation-delay:.3s}
+@keyframes blink{0%,100%{opacity:.3}50%{opacity:1}}
+@media (max-width:760px){
+.h-hero{font-size:34px !important}
+.h-sec{font-size:24px !important}
+.pad{padding-left:16px !important;padding-right:16px !important}
+.hide-sm{display:none !important}
+}
+</style>
+
+</head>
+<body>
+<div id="app"></div>
+<script>
+var __H=[];
+function h(fn){ if(typeof fn!=="function") return -1; __H.push(fn); return __H.length-1; }
+function esc(x){ return x==null?"":String(x).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+var __comp=null, __pending=false;
+class DCLogic {
+  constructor(props){ this.props=props||{}; }
+  setState(p){ var patch=typeof p==="function"?p(this.state):p; this.state=Object.assign({},this.state,patch); __schedule(); }
+  forceUpdate(){ __schedule(); }
+}
+function __schedule(){ if(__pending) return; __pending=true; Promise.resolve().then(function(){ __pending=false; __render(); }); }
+
+var T = {
+  ru: {
+    navPick: 'Подбор санатория', navReg: 'Реестр санаториев', navDoc: 'Консультация врача', login: 'Войти',
+    badge: 'Цифровой ассистент по подбору санаториев',
+    heroTitle: 'Санаторий, который подходит вашему здоровью',
+    heroSub: 'Ответьте на несколько вопросов о самочувствии, диагнозе, возрасте и бюджете. Elim-AI сопоставит ответы с реестром санаториев Казахстана и предложит 3–5 подходящих вариантов.',
+    ctaStart: 'Начать подбор', ctaReg: 'Все санатории', free: 'Бесплатно для пользователей',
+    howTitle: 'Как работает Elim-AI', featTitle: 'Что умеет сервис', topTitle: 'Рейтинг санаториев',
+    chatTitle: 'Elim-AI · подбор санатория',
+    greet: 'Здравствуйте! Я Elim-AI. Задам несколько вопросов и подберу санатории под ваше здоровье. Это бесплатно и займёт 2–3 минуты.',
+    how: [['Анкета', 'Цель поездки, жалобы, диагноз, возраст, регион и бюджет — 2–3 минуты.'], ['Анализ', 'Ассистент сопоставляет ответы с профилями лечения и противопоказаниями санаториев.'], ['Подборка', '3–5 вариантов с объяснением: какие процедуры, условия и цены.'], ['Бронирование', 'Бронирование, консультация врача и оплата — онлайн.']],
+    feats: ['Подбор по диагнозу и показаниям', 'Учёт возраста и противопоказаний', 'Онлайн-консультация врача', 'Бронирование и оплата онлайн', 'Поддержка 24/7', 'Казахский и русский язык', 'Отзывы и рейтинг санаториев', 'Единый реестр санаториев РК']
+  },
+  kz: {
+    navPick: 'Шипажай таңдау', navReg: 'Шипажайлар тізілімі', navDoc: 'Дәрігер кеңесі', login: 'Кіру',
+    badge: 'Шипажай таңдауға арналған цифрлық көмекші',
+    heroTitle: 'Денсаулығыңызға сай келетін шипажай',
+    heroSub: 'Денсаулығыңыз, диагнозыңыз, жасыңыз және бюджетіңіз туралы бірнеше сұраққа жауап беріңіз. Elim-AI жауаптарыңызды Қазақстан шипажайларының тізілімімен салыстырып, сізге лайықты 3–5 нұсқаны ұсынады.',
+    ctaStart: 'Таңдауды бастау', ctaReg: 'Барлық шипажайлар', free: 'Пайдаланушылар үшін тегін',
+    howTitle: 'Elim-AI қалай жұмыс істейді', featTitle: 'Сервис мүмкіндіктері', topTitle: 'Шипажайлар рейтингі',
+    chatTitle: 'Elim-AI · шипажай таңдау',
+    greet: 'Сәлеметсіз бе! Мен — Elim-AI. Бірнеше сұрақ қойып, денсаулығыңызға сай шипажайларды іріктеймін. Бұл тегін және 2–3 минут алады.',
+    how: [['Сауалнама', 'Сапар мақсаты, шағымдар, диагноз, жас, аймақ және бюджет — 2–3 минут.'], ['Талдау', 'Көмекші жауаптарды шипажайлардың емдеу бейіндерімен және қарсы көрсетілімдерімен салыстырады.'], ['Іріктеу', 'Түсініктемесі бар 3–5 нұсқа: емшаралар, жағдайлар және бағалар.'], ['Брондау', 'Брондау, дәрігер кеңесі және төлем — онлайн.']],
+    feats: ['Диагноз және көрсетілімдер бойынша таңдау', 'Жас пен қарсы көрсетілімдерді ескеру', 'Дәрігердің онлайн кеңесі', 'Онлайн брондау және төлем', 'Тәулік бойы қолдау', 'Қазақ және орыс тілдері', 'Пікірлер мен рейтинг', 'ҚР шипажайларының бірыңғай тізілімі']
+  }
+};
+
+var SYSTEMS = [
+  { id: 'joints', label: 'Суставы и позвоночник', procs: 'Грязелечение, подводное вытяжение позвоночника, ЛФК, массаж' },
+  { id: 'gi', label: 'Пищеварение (ЖКТ)', procs: 'Питьевые минеральные воды, лечебное питание, кишечные орошения' },
+  { id: 'heart', label: 'Сердце и сосуды', procs: 'Кардиотренировки, углекислые ванны, ЭКГ-мониторинг, терренкур' },
+  { id: 'nerve', label: 'Нервная система и сон', procs: 'Хвойные ванны, электросон, психотерапия, массаж' },
+  { id: 'resp', label: 'Органы дыхания', procs: 'Галокамера, ингаляции, дыхательная гимнастика, кумысолечение' },
+  { id: 'uro', label: 'Почки и урология', procs: 'Минеральные воды, радоновые ванны, физиотерапия' }
+];
+var DIAGS = {
+  joints: [['osteo', 'Остеохондроз'], ['arthr', 'Артроз'], ['hernia', 'Грыжа позвоночника (вне обострения)']],
+  gi: [['gastr', 'Гастрит'], ['ulcer', 'Язвенная болезнь (ремиссия)'], ['chole', 'Холецистит']],
+  heart: [['htn', 'Гипертония I–II ст.'], ['ihd', 'ИБС, стабильная'], ['postmi', 'Восстановление после инфаркта']],
+  nerve: [['stress', 'Неврозы, стресс'], ['insom', 'Нарушения сна'], ['stroke', 'Восстановление после инсульта']],
+  resp: [['bronch', 'Хронический бронхит'], ['asthma', 'Астма (ремиссия)'], ['postcovid', 'Постковидный синдром']],
+  uro: [['pyelo', 'Пиелонефрит (ремиссия)'], ['stones', 'Мочекаменная болезнь'], ['prost', 'Хронический простатит']]
+};
+var DIAG_LABEL = {}; var DIAG_SYS = {};
+Object.keys(DIAGS).forEach(function (k) { DIAGS[k].forEach(function (d) { DIAG_LABEL[d[0]] = d[1]; DIAG_SYS[d[0]] = k; }); });
+
+var SAN = [
+  { id: 1, name: 'Сосновый бор', region: 'Бурабай, Акмолинская обл.', regionId: 'akm', rating: 4.8, reviews: 214, price: 32000, profiles: ['resp', 'nerve', 'heart'], kids: true, radon: false, mud: false, specials: ['bronch', 'postcovid', 'stress'], color: '#5C8A80', left: 3 },
+  { id: 2, name: 'Минерал Су', region: 'Сарыагаш, Туркестанская обл.', regionId: 'trk', rating: 4.6, reviews: 389, price: 28000, profiles: ['gi', 'uro'], kids: true, radon: false, mud: false, specials: ['gastr', 'chole', 'pyelo'], color: '#C4A27E', left: 8 },
+  { id: 3, name: 'Алатау Демалыс', region: 'Предгорья, Алматинская обл.', regionId: 'alm', rating: 4.9, reviews: 156, price: 41000, profiles: ['heart', 'nerve'], kids: false, radon: false, mud: false, specials: ['htn', 'ihd', 'postmi', 'stroke'], color: '#7C98AD', left: 2 },
+  { id: 4, name: 'Тұзды Көл', region: 'Павлодарская обл.', regionId: 'pvl', rating: 4.5, reviews: 97, price: 24000, profiles: ['joints', 'gi'], kids: true, radon: false, mud: true, specials: ['osteo', 'arthr'], color: '#A68F7B', left: 11 },
+  { id: 5, name: 'Жасыл Аңғар', region: 'Алтай, ВКО', regionId: 'vko', rating: 4.7, reviews: 132, price: 35000, profiles: ['joints', 'uro', 'heart'], kids: false, radon: true, mud: false, specials: ['arthr', 'hernia', 'prost'], color: '#6E8C69', left: 4 },
+  { id: 6, name: 'Көкшетау Шипа', region: 'Щучинск, Акмолинская обл.', regionId: 'akm', rating: 4.4, reviews: 178, price: 26000, profiles: ['resp', 'joints'], kids: true, radon: false, mud: false, specials: ['asthma', 'postcovid', 'osteo'], color: '#89A2A7', left: 6 },
+  { id: 7, name: 'Нұрлы Бұлақ', region: 'Сарыагаш, Туркестанская обл.', regionId: 'trk', rating: 4.5, reviews: 241, price: 30000, profiles: ['gi', 'uro', 'joints'], kids: true, radon: false, mud: true, specials: ['ulcer', 'stones'], color: '#B79B78', left: 5 },
+  { id: 8, name: 'Тау Самалы', region: 'Алматинская обл.', regionId: 'alm', rating: 4.6, reviews: 119, price: 38000, profiles: ['nerve', 'resp'], kids: true, radon: false, mud: false, specials: ['insom', 'stress', 'postcovid'], color: '#7F9E95', left: 2 }
+];
+var RANKED = SAN.slice().sort(function (a, b) { return b.rating - a.rating; });
+SAN.forEach(function (x) { x.rank = RANKED.indexOf(x) + 1; });
+
+var REGION_OPTS = [['any', 'Не важно, главное — лечение'], ['akm', 'Бурабай / Щучинск'], ['alm', 'Алматинская обл.'], ['trk', 'Сарыагаш'], ['vko', 'ВКО / Алтай'], ['pvl', 'Павлодарская обл.']];
+var BUDGET_OPTS = [['b1', 'до 25 000 ₸', 0, 25000], ['b2', '25 – 35 000 ₸', 0, 35000], ['b3', '35 – 45 000 ₸', 0, 45000], ['b4', 'Не ограничен', 0, 1e9]];
+var GOAL_OPTS = [['treat', 'Лечение хронического заболевания'], ['rehab', 'Восстановление после болезни или операции'], ['prev', 'Профилактика и оздоровление']];
+var AGE_OPTS = [['child', 'До 18 лет (ребёнок)'], ['a18', '18–40'], ['a41', '41–60'], ['a60', 'Старше 60']];
+var CONTRA_OPTS = [['no', 'Ничего из перечисленного'], ['onco', 'Онкология, в т.ч. в прошлом'], ['preg', 'Беременность'], ['acute', 'Сейчас обострение']];
+var PAYS = [['kaspi', 'Kaspi', 'Оплата или рассрочка в приложении Kaspi.kz'], ['card', 'Банковская карта', 'Visa, Mastercard'], ['qr', 'QR-код', 'Оплата через банковское приложение']];
+
+function fmt(n) { return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, ' '); }
+function lab(list, id) { for (var i = 0; i < list.length; i++) if (list[i][0] === id) return list[i][1]; return ''; }
+function sysLabel(id) { for (var i = 0; i < SYSTEMS.length; i++) if (SYSTEMS[i].id === id) return SYSTEMS[i].label; return id; }
+function sysProcs(id) { for (var i = 0; i < SYSTEMS.length; i++) if (SYSTEMS[i].id === id) return SYSTEMS[i].procs; return ''; }
+function plural(n, a, b, c) { var m = n % 10, h = n % 100; if (m === 1 && h !== 11) return a; if (m >= 2 && m <= 4 && (h < 10 || h >= 20)) return b; return c; }
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      lang: 'ru', screen: 'home', prev: 'home', step: 0, sel: [],
+      ans: { goal: null, systems: [], diags: [], age: null, contra: [], region: null, budget: null },
+      analyzing: false, finished: false, freeNote: false, file: false,
+      sanId: 4, tab: 'treat', roomIdx: 1, guests: 1, pay: 'kaspi', consent: true,
+      regFilter: '', doc: 0, fmt: 'video', slot: null, consultDone: false, support: false
+    };
+  }
+  go(screen, extra) {
+    var patch = Object.assign({ screen: screen, prev: this.state.screen, support: false }, extra || {});
+    this.setState(patch);
+    try { window.scrollTo(0, 0); } catch (e) {}
+  }
+  bottom() { setTimeout(function () { try { window.scrollTo(0, document.body.scrollHeight); } catch (e) {} }, 30); }
+
+  evaluate() {
+    var a = this.state.ans, out = [], excluded = [];
+    var budget = BUDGET_OPTS.filter(function (b) { return b[0] === a.budget; })[0] || BUDGET_OPTS[3];
+    SAN.forEach(function (x) {
+      var reason = null;
+      if (a.contra.indexOf('onco') >= 0 && (x.radon || x.mud)) reason = (x.radon ? 'радоновые ванны' : 'грязелечение') + ' противопоказаны при онкологии';
+      else if (a.contra.indexOf('preg') >= 0 && x.radon) reason = 'радонотерапия противопоказана при беременности';
+      else if (a.age === 'child' && !x.kids) reason = 'не принимает детей';
+      if (reason) { if (a.systems.some(function (s) { return x.profiles.indexOf(s) >= 0; })) excluded.push({ name: x.name, reason: reason }); return; }
+      var hitSys = a.systems.filter(function (s) { return x.profiles.indexOf(s) >= 0; });
+      var hitDiag = a.diags.filter(function (d) { return x.specials.indexOf(d) >= 0; });
+      var score = a.systems.length ? (hitSys.length ? 58 + Math.round(24 * hitSys.length / a.systems.length) : 22) : 50;
+      score += Math.min(12, hitDiag.length * 6);
+      var why = [];
+      hitSys.forEach(function (s) { why.push({ text: sysLabel(s) + ': ' + sysProcs(s).toLowerCase() }); });
+      hitDiag.forEach(function (d) { why.push({ text: 'Специализация на диагнозе «' + DIAG_LABEL[d] + '»' }); });
+      if (a.region && a.region !== 'any') { if (x.regionId === a.region) { score += 4; why.push({ text: 'В выбранном регионе' }); } else score -= 4; }
+      if (x.price <= budget[3]) { score += 3; if (a.budget && a.budget !== 'b4') why.push({ text: 'Укладывается в бюджет: от ' + fmt(x.price) + ' ₸ / сутки' }); } else score -= 10;
+      if (a.age === 'a60' && x.profiles.indexOf('heart') >= 0) { score += 2; why.push({ text: 'Есть кардиоконтроль — важно для гостей 60+' }); }
+      if (a.age === 'child') why.push({ text: 'Принимает детей, есть детские программы' });
+      if (a.contra.length && a.contra.indexOf('no') < 0) why.push({ text: 'Учтены противопоказания из анкеты' });
+      score = Math.max(15, Math.min(97, score - (x.id % 3)));
+      out.push({ x: x, score: score, why: why.slice(0, 4) });
+    });
+    out.sort(function (p, q) { return q.score - p.score; });
+    var good = out.filter(function (r) { return r.score >= 55; });
+    if (good.length < 3) good = out.slice(0, 3);
+    return { list: good.slice(0, 5), excluded: excluded };
+  }
+
+  roomsOf(x) {
+    var self = this;
+    return [
+      { name: 'Стандарт, 1-местный', desc: 'Душ, ТВ · питание 3 раза · лечение по назначению', k: 1.15, left: Math.max(1, x.left - 2) },
+      { name: 'Стандарт, 2-местный', desc: 'Две кровати, балкон · питание 3 раза · лечение', k: 1, left: x.left },
+      { name: 'Полулюкс', desc: 'Гостиная зона · улучшенное питание · расширенная программа', k: 1.55, left: 1 }
+    ].map(function (r, i) {
+      var low = r.left <= 3;
+      return { name: r.name, desc: r.desc, price: x.price * r.k, priceStr: fmt(x.price * r.k),
+        leftLabel: low ? 'Осталось ' + r.left + ' ' + plural(r.left, 'номер', 'номера', 'номеров') + ' на эти даты' : 'Свободно ' + r.left + ' номеров',
+        leftCls: low ? 'left-low' : 'left-ok', choose: function () { self.go('book', { roomIdx: i }); } };
+    });
+  }
+
+  renderVals() {
+    var s = this.state, self = this, a = s.ans, t = T[s.lang];
+
+    // ----- assistant steps -----
+    var diagOpts = [];
+    a.systems.forEach(function (sy) { (DIAGS[sy] || []).forEach(function (d) { diagOpts.push(d); }); });
+    diagOpts.push(['none', 'Диагноза нет / не знаю']);
+    var STEPS = [
+      { key: 'goal', q: 'Какова основная цель поездки?', opts: GOAL_OPTS },
+      { key: 'systems', q: 'Что беспокоит?', multi: true, opts: SYSTEMS.map(function (x) { return [x.id, x.label]; }) },
+      { key: 'diags', q: 'Есть ли диагноз от врача?', hint: 'Отметьте подходящие — с диагнозом подбор точнее. Список зависит от выбранных жалоб.', multi: true, opts: diagOpts, isDiag: true },
+      { key: 'age', q: 'Сколько лет пациенту?', hint: 'Возраст влияет на допустимые процедуры.', opts: AGE_OPTS },
+      { key: 'contra', q: 'Есть ли что-то из этого?', hint: 'Это важно для безопасности: часть процедур при этом противопоказана. Можно выбрать несколько.', multi: true, opts: CONTRA_OPTS },
+      { key: 'region', q: 'Где удобнее пройти лечение?', opts: REGION_OPTS },
+      { key: 'budget', q: 'Какой бюджет на человека в сутки (проживание, питание, лечение)?', opts: BUDGET_OPTS }
+    ];
+    var STEP_NAMES = ['Цель', 'Жалобы', 'Диагноз', 'Возраст', 'Противопоказания', 'Регион', 'Бюджет'];
+    var DESCS = {
+      treat: 'Плановое лечение того, что беспокоит давно', rehab: 'Реабилитация после COVID, операции, инфаркта, инсульта', prev: 'Без конкретного диагноза — для поддержания здоровья',
+      none: 'Подберём по жалобам', no: 'Противопоказаний нет', acute: 'Санаторное лечение проводится вне обострения'
+    };
+    var asking = s.step < STEPS.length && !s.analyzing;
+    var cur = { opts: [], groups: [], q: '', hint: '', isDiag: false, notDiag: true, next: null, back: null, nextCls: 'btn btn-off', nextLabel: 'Далее' };
+    if (asking) {
+      var st = STEPS[s.step];
+      var exclusive = { none: 1, no: 1 };
+      var mkOpt = function (o) {
+        var on = s.sel.indexOf(o[0]) >= 0;
+        return {
+          label: o[1], desc: DESCS[o[0]] || '', on: on,
+          cls: on ? 'opt opt-on' : 'opt',
+          boxCls: st.multi ? (on ? 'box box-on' : 'box') : (on ? 'rad rad-on' : 'rad'),
+          pick: function () {
+            if (!st.multi) { self.setState({ sel: [o[0]] }); return; }
+            var sel = s.sel.slice();
+            if (on) sel = sel.filter(function (v) { return v !== o[0]; });
+            else if (exclusive[o[0]]) sel = [o[0]];
+            else sel = sel.filter(function (v) { return !exclusive[v]; }).concat([o[0]]);
+            self.setState({ sel: sel });
+          }
+        };
+      };
+      var groups = [];
+      if (st.isDiag) {
+        a.systems.forEach(function (sy) { groups.push({ label: sysLabel(sy), opts: (DIAGS[sy] || []).map(mkOpt) }); });
+        groups.push({ label: 'Если диагноза нет', opts: [mkOpt(['none', 'Диагноза нет / не знаю'])] });
+      }
+      var canNext = s.sel.length > 0 || (st.isDiag && s.file);
+      var presetFor = function (idx, ans) {
+        var k = STEPS[idx].key, v = ans[k];
+        return STEPS[idx].multi ? (v || []).slice() : (v ? [v] : []);
+      };
+      cur = {
+        q: st.q, hint: st.hint || (st.multi ? 'Можно выбрать несколько вариантов.' : 'Выберите один вариант.'),
+        isDiag: !!st.isDiag, notDiag: !st.isDiag, groups: groups,
+        opts: st.isDiag ? [] : st.opts.map(mkOpt),
+        nextCls: canNext ? 'btn' : 'btn btn-off',
+        nextLabel: s.step === STEPS.length - 1 ? 'Показать санатории' : 'Далее',
+        back: function () {
+          if (s.step === 0) { self.go('home'); return; }
+          self.setState({ step: s.step - 1, sel: presetFor(s.step - 1, s.ans) });
+        },
+        next: function () {
+          if (!canNext) return;
+          var p = {}; p[st.key] = st.multi ? s.sel.slice() : s.sel[0];
+          var newAns = Object.assign({}, s.ans, p);
+          var nextStep = s.step + 1;
+          if (nextStep >= STEPS.length) {
+            self.setState({ ans: newAns, step: nextStep, sel: [], analyzing: true });
+            setTimeout(function () { self.setState({ analyzing: false, finished: true }); self.go('results'); }, 1300);
+          } else {
+            self.setState({ ans: newAns, step: nextStep, sel: presetFor(nextStep, newAns) });
+          }
+          try { window.scrollTo(0, 0); } catch (e) {}
+        }
+      };
+    }
+    var ev = this.evaluate();
+    var results = ev.list.map(function (r, idx) {
+      return { name: r.x.name, region: r.x.region, rating: r.x.rating, reviews: r.x.reviews, color: r.x.color, score: r.score, why: r.why,
+        priceStr: fmt(r.x.price), badge: idx === 0 ? 'Лучшее совпадение' : '#' + (idx + 1),
+        open: function () { self.go('detail', { sanId: r.x.id, tab: 'treat' }); },
+        book: function () { self.go('book', { sanId: r.x.id, roomIdx: 1 }); } };
+    });
+    var scoreOf = {}; ev.list.forEach(function (r) { scoreOf[r.x.id] = r.score; });
+    var profileRows = [
+      ['Цель', lab(GOAL_OPTS, a.goal)], ['Что беспокоит', a.systems.map(sysLabel).join(', ')],
+      ['Диагноз', a.diags.map(function (d) { return DIAG_LABEL[d] || 'нет / не знаю'; }).join(', ') + (s.file ? (a.diags.length ? ' + выписка' : 'выписка загружена') : '')],
+      ['Возраст', lab(AGE_OPTS, a.age)], ['Противопоказания', a.contra.map(function (c) { return lab(CONTRA_OPTS, c); }).join(', ')],
+      ['Регион', lab(REGION_OPTS, a.region)], ['Бюджет в сутки', lab(BUDGET_OPTS, a.budget)]
+    ].map(function (r) { return { label: r[0], val: r[1] || '—' }; });
+
+    // ----- sanatorium detail -----
+    var x = SAN.filter(function (v) { return v.id === s.sanId; })[0] || SAN[0];
+    var contra = ['Онкологические заболевания', 'Острые инфекции и обострения хронических заболеваний', 'Психические расстройства в острой фазе'];
+    if (x.radon) contra.push('Беременность (радоновые ванны)');
+    if (x.mud) contra.push('Тяжёлые сердечно-сосудистые нарушения (грязелечение)');
+    var san = {
+      name: x.name, region: x.region, rating: x.rating, reviews: x.reviews, color: x.color, rank: x.rank,
+      priceStr: fmt(x.price), hasScore: s.finished && scoreOf[x.id] > 0, score: scoreOf[x.id] || 0,
+      treat: x.profiles.map(function (p) { return { label: sysLabel(p), procs: sysProcs(p), diags: (DIAGS[p] || []).map(function (d) { return d[1]; }).join(', ') }; }),
+      contraStr: contra.join(' · '),
+      rooms: this.roomsOf(x)
+    };
+    var room = san.rooms[s.roomIdx] || san.rooms[1];
+    var total = room.price * 10 * s.guests;
+    var TABS = [['treat', 'Лечение'], ['rooms', 'Номера и цены'], ['reviews', 'Отзывы'], ['doctors', 'Врачи']];
+    var DOCS = [{ spec: 'Врач-курортолог' }, { spec: 'Физиотерапевт' }, { spec: 'Кардиолог-реабилитолог' }];
+    var SLOTS_T = [['t1', '17:00', true], ['t2', '18:30', false], ['t3', '19:30', false], ['t4', '21:00', false]];
+    var SLOTS_M = [['m1', '09:00', false], ['m2', '10:30', false], ['m3', '12:00', true], ['m4', '15:30', false]];
+    var mkSlot = function (sl, day) {
+      return { label: sl[1], cls: sl[2] ? 'slot slot-off' : (s.slot === sl[0] ? 'slot slot-on' : 'slot'),
+        pick: function () { if (!sl[2]) self.setState({ slot: sl[0] }); }, day: day };
+    };
+    var slotLabel = '';
+    SLOTS_T.forEach(function (sl) { if (sl[0] === s.slot) slotLabel = 'сегодня в ' + sl[1]; });
+    SLOTS_M.forEach(function (sl) { if (sl[0] === s.slot) slotLabel = 'завтра в ' + sl[1]; });
+    var fmtLabel = { video: 'видеозвонок', chat: 'чат', call: 'телефонный звонок' }[s.fmt];
+
+    var regList = SAN.filter(function (v) { return !s.regFilter || v.profiles.indexOf(s.regFilter) >= 0; })
+      .sort(function (p, q) { return q.rating - p.rating; })
+      .map(function (v) { return { name: v.name, region: v.region, rating: v.rating, color: v.color, priceStr: fmt(v.price),
+        tags: v.profiles.map(function (p) { return { label: sysLabel(p) }; }), open: function () { self.go('detail', { sanId: v.id, tab: 'treat' }); } }; });
+
+    var navCls = function (on) { return on ? 'lnk lnk-on' : 'lnk'; };
+    var payObj = PAYS.filter(function (p) { return p[0] === s.pay; })[0];
+    var aSummary = [a.systems.map(sysLabel).join(', '), lab(AGE_OPTS, a.age) ? 'возраст ' + lab(AGE_OPTS, a.age) : '', lab(BUDGET_OPTS, a.budget)].filter(Boolean).join(' · ');
+
+    return {
+      t: t,
+      langKzCls: s.lang === 'kz' ? 'lang lang-on' : 'lang', langRuCls: s.lang === 'ru' ? 'lang lang-on' : 'lang',
+      setKz: function () { self.setState({ lang: 'kz' }); }, setRu: function () { self.setState({ lang: 'ru' }); },
+      navPickCls: navCls(s.screen === 'assistant' || s.screen === 'results'), navRegCls: navCls(s.screen === 'registry'), navDocCls: navCls(s.screen === 'consult'),
+      isHome: s.screen === 'home', isAssistant: s.screen === 'assistant', isResults: s.screen === 'results', isRegistry: s.screen === 'registry',
+      isDetail: s.screen === 'detail', isConsult: s.screen === 'consult', isBook: s.screen === 'book', isDone: s.screen === 'done',
+      goHome: function () { self.go('home'); },
+      goAssistant: function () { self.go(s.finished ? 'results' : 'assistant'); },
+      goRegistry: function () { self.go('registry'); },
+      goConsultAny: function () { self.go('consult', { consultDone: false }); },
+      goResults: function () { self.go('results'); },
+      goResultsOrAssistant: function () { self.go(s.finished ? 'results' : 'assistant'); },
+      backToChat: function () { self.go('assistant', { step: 0, sel: a.goal ? [a.goal] : [] }); },
+      backToDetail: function () { self.go('detail'); },
+      goBackFromDetail: function () { self.go(s.prev === 'registry' || s.prev === 'home' ? s.prev : (s.finished ? 'results' : 'registry')); },
+      backLabel: s.prev === 'home' ? 'На главную' : (s.prev === 'registry' || !s.finished ? 'К реестру санаториев' : 'К подборке'),
+
+      how: t.how.map(function (h, i) { return { n: '0' + (i + 1), title: h[0], desc: h[1] }; }),
+      features: t.feats.map(function (f) { return { label: f }; }),
+      top: RANKED.slice(0, 4).map(function (v) { return { name: v.name, region: v.region, rating: v.rating, color: v.color, rank: v.rank,
+        profilesStr: v.profiles.map(sysLabel).join(' · '), open: function () { self.go('detail', { sanId: v.id, tab: 'treat' }); } }; }),
+
+      stepNum: Math.min(s.step + 1, 7), progress: Math.round(Math.min(s.step, 7) / 7 * 100) + '%',
+      stepName: STEP_NAMES[Math.min(s.step, 6)],
+      asking: asking, cur: cur, analyzing: s.analyzing, finished: s.finished,
+      restart: function () { self.setState({ step: 0, sel: [], finished: false, analyzing: false, file: false, ans: { goal: null, systems: [], diags: [], age: null, contra: [], region: null, budget: null } }); },
+      addFile: function () { self.setState({ file: true }); },
+      fileTitle: s.file ? '✓ Выписка_врача.pdf прикреплена' : 'Приложить выписку или заключение врача',
+      profileRows: profileRows,
+
+      results: results, resCountLabel: results.length + ' ' + plural(results.length, 'санаторий', 'санатория', 'санаториев'),
+      summary: aSummary || 'По вашим ответам',
+      hasAcute: a.contra.indexOf('acute') >= 0,
+      hasExcluded: ev.excluded.length > 0, excluded: ev.excluded, excludedCount: ev.excluded.length,
+
+      regCount: SAN.length + ' ' + plural(SAN.length, 'санаторий', 'санатория', 'санаториев'),
+      regChips: [['', 'Все']].concat(SYSTEMS.map(function (v) { return [v.id, v.label]; })).map(function (c) {
+        return { label: c[1], cls: s.regFilter === c[0] ? 'chip chip-sm chip-on' : 'chip chip-sm', pick: function () { self.setState({ regFilter: c[0] }); } };
+      }),
+      registry: regList,
+
+      san: san, room: room, totalStr: fmt(total),
+      tabs: TABS.map(function (tb) { return { label: tb[1], cls: s.tab === tb[0] ? 'tab tab-on' : 'tab', pick: function () { self.setState({ tab: tb[0] }); } }; }),
+      tabTreat: s.tab === 'treat', tabRooms: s.tab === 'rooms', tabReviews: s.tab === 'reviews', tabDoctors: s.tab === 'doctors',
+      showRooms: function () { self.setState({ tab: 'rooms' }); },
+      scores: [{ label: 'Эффект от лечения', val: '4.8', pct: '96%' }, { label: 'Питание', val: '4.5', pct: '90%' }, { label: 'Номера', val: '4.4', pct: '88%' }, { label: 'Персонал', val: '4.9', pct: '98%' }],
+      reviewStubs: x.profiles.slice(0, 2).map(function (p) { return { profile: sysLabel(p) }; }),
+      doctors: DOCS.map(function (d, i) { return { spec: d.spec, consult: function () { self.go('consult', { doc: i, consultDone: false }); } }; }),
+
+      consultForm: !s.consultDone, consultDone: s.consultDone,
+      doctorsPick: DOCS.map(function (d, i) { return { spec: d.spec, cls: s.doc === i ? 'opt opt-on' : 'opt', pick: function () { self.setState({ doc: i }); } }; }),
+      formats: [['video', 'Видеозвонок'], ['chat', 'Чат'], ['call', 'Звонок']].map(function (f) {
+        return { label: f[1], cls: s.fmt === f[0] ? 'chip chip-on' : 'chip', pick: function () { self.setState({ fmt: f[0] }); } };
+      }),
+      slotsToday: SLOTS_T.map(function (sl) { return mkSlot(sl); }), slotsTomorrow: SLOTS_M.map(function (sl) { return mkSlot(sl); }),
+      consultBtnCls: s.slot ? 'btn' : 'btn btn-off',
+      confirmConsult: function () { if (s.slot) { self.setState({ consultDone: true }); try { window.scrollTo(0, 0); } catch (e) {} } },
+      slotLabel: slotLabel,
+      consultDoneText: DOCS[s.doc].spec + ', формат — ' + fmtLabel + '.',
+
+      guests: s.guests, guestsLabel: s.guests + ' ' + (s.guests === 1 ? 'взрослый' : 'взрослых'),
+      guestMinus: function () { self.setState({ guests: Math.max(1, s.guests - 1) }); },
+      guestPlus: function () { self.setState({ guests: Math.min(4, s.guests + 1) }); },
+      pays: PAYS.map(function (p) { return { title: p[1], desc: p[2], on: s.pay === p[0], cls: s.pay === p[0] ? 'opt opt-on' : 'opt', pick: function () { self.setState({ pay: p[0] }); } }; }),
+      consent: s.consent, toggleConsent: function () { self.setState({ consent: !s.consent }); },
+      payCls: s.consent ? 'btn' : 'btn btn-off',
+      submit: function () { if (s.consent) self.go('done'); },
+      payTitle: payObj ? payObj[1] : 'Kaspi',
+      timeline: [
+        { title: 'Заявка создана', desc: 'Сегодня', dot: 'dot dot-done' },
+        { title: 'Подтверждение санатория', desc: 'Проверяем наличие номера', dot: 'dot dot-now' },
+        { title: 'Оплата онлайн', desc: 'Ссылка придёт после подтверждения', dot: 'dot dot-next' },
+        { title: 'Заезд 15 ноября', desc: 'Путёвка, памятка и контакты врача — в личном кабинете', dot: 'dot dot-next' }
+      ],
+
+      supportOpen: s.support, toggleSupport: function () { self.setState({ support: !s.support }); }
+    };
+  }
+}
+
+function view(v){return `
+
+
+<div style="font-family: 'Golos Text', sans-serif; color: #0F2A33; background: #F2F6F7; min-height: 100vh; position: relative">
+
+<div style="background: #0F2A33; color: #D6E3E6; font-size: 13px; text-align: center; padding: 8px 16px">POC на заглушках · санатории, цены, рейтинги и врачи — демонстрационные</div>
+
+<header class="pad" style="background: #FFFFFF; border-bottom: 1px solid #DCE6E9; padding: 0 48px">
+<div style="max-width: 1240px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; min-height: 72px">
+<button class="cardbtn" style="width: auto; display: flex; align-items: center; gap: 10px" data-h="${h(v.goHome)}" aria-label="Elim-AI, на главную">
+<span style="width: 36px; height: 36px; border-radius: 10px; background: #0E5E6F; display: flex; align-items: center; justify-content: center">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"></path><path d="M12 8.5 13.2 11l2.3 1-2.3 1L12 15.5 10.8 13l-2.3-1 2.3-1z"></path></svg></span>
+<span style="font-family: Onest, sans-serif; font-weight: 700; font-size: 22px; letter-spacing: -0.4px">Elim-AI</span>
+</button>
+<nav style="display: flex; gap: 18px; flex-wrap: wrap; align-items: center">
+<button class="${esc(v.navPickCls)}" data-h="${h(v.goAssistant)}">${esc(v.t.navPick)}</button>
+<button class="${esc(v.navRegCls)}" data-h="${h(v.goRegistry)}">${esc(v.t.navReg)}</button>
+<button class="${esc(v.navDocCls)}" data-h="${h(v.goConsultAny)}">${esc(v.t.navDoc)}</button>
+<div style="display: flex; gap: 2px; background: #EEF3F4; border-radius: 10px; padding: 3px" role="group" aria-label="Язык">
+<button class="${esc(v.langKzCls)}" data-h="${h(v.setKz)}">ҚАЗ</button>
+<button class="${esc(v.langRuCls)}" data-h="${h(v.setRu)}">РУС</button>
+</div>
+<button class="btn2" style="min-height: 44px; font-size: 15px">${esc(v.t.login)}</button>
+</nav>
+</div>
+</header>
+
+
+${v.isHome?`
+<section class="pad" style="padding: 72px 48px 72px; background: #FFFFFF">
+<div style="max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
+<div style="flex: 1 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 24px">
+<span style="align-self: flex-start; background: #E6F0F2; color: #0E5E6F; border-radius: 999px; padding: 8px 14px; font-size: 14px; font-weight: 600">${esc(v.t.badge)}</span>
+<h1 class="h-hero" style="margin: 0; font-family: Onest, sans-serif; font-weight: 700; font-size: 56px; line-height: 1.06; letter-spacing: -1.6px">${esc(v.t.heroTitle)}</h1>
+<p style="margin: 0; font-size: 19px; line-height: 1.55; color: #4A5F66; max-width: 580px">${esc(v.t.heroSub)}</p>
+<div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: center">
+<button class="btn" style="min-height: 54px; padding: 0 26px; font-size: 17px" data-h="${h(v.goAssistant)}">${esc(v.t.ctaStart)}
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></button>
+<button class="btn2" style="min-height: 54px" data-h="${h(v.goRegistry)}">${esc(v.t.ctaReg)}</button>
+</div>
+<span style="color: #0E5E6F; font-weight: 600; font-size: 15px">✓ ${esc(v.t.free)}</span>
+</div>
+
+<div style="flex: 1 1 420px; min-width: 0; background: #F2F6F7; border: 1px solid #DCE6E9; border-radius: 24px; padding: 22px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px">
+<span style="font-weight: 600">Шаг 2 из 7 · Что беспокоит?</span><span style="color: #4A5F66; font-size: 13px">Можно несколько</span></div>
+<div style="height: 4px; background: #DCE6E9; border-radius: 999px"><div style="height: 4px; width: 28%; background: #0E5E6F; border-radius: 999px"></div></div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<div style="background: #E6F0F2; border: 2px solid #0E5E6F; border-radius: 12px; padding: 12px; font-weight: 600; font-size: 14px">✓ Суставы и позвоночник</div>
+<div style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 12px; padding: 13px; font-size: 14px">Пищеварение (ЖКТ)</div>
+<div style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 12px; padding: 13px; font-size: 14px">Сердце и сосуды</div>
+<div style="background: #E6F0F2; border: 2px solid #0E5E6F; border-radius: 12px; padding: 12px; font-weight: 600; font-size: 14px">✓ Нервная система и сон</div>
+</div>
+<div style="background: #FFFFFF; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 13px; color: #4A5F66">Подходящие санатории</span>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span style="font-weight: 600">Тұзды Көл</span><span style="font-weight: 600; color: #0E5E6F">94%</span></div>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span style="font-weight: 600">Жасыл Аңғар</span><span style="font-weight: 600; color: #0E5E6F">89%</span></div>
+<div style="display: flex; justify-content: space-between; gap: 8px"><span style="font-weight: 600">Көкшетау Шипа</span><span style="font-weight: 600; color: #0E5E6F">81%</span></div>
+</div>
+</div>
+</div>
+</section>
+
+<section class="pad" style="padding: 80px 48px 0">
+<div style="max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+<h2 class="h-sec" style="margin: 0; font-family: Onest, sans-serif; font-weight: 700; font-size: 34px; letter-spacing: -0.6px">${esc(v.t.howTitle)}</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px">
+${(v.how||[]).map(function(h){return `
+<div style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 18px; padding: 24px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: Onest, sans-serif; font-weight: 700; font-size: 28px; color: #0E5E6F">${esc(h.n)}</span>
+<span style="font-weight: 600; font-size: 18px">${esc(h.title)}</span>
+<span style="color: #4A5F66; line-height: 1.5">${esc(h.desc)}</span>
+</div>
+`;}).join("")}
+</div>
+</div>
+</section>
+
+<section class="pad" style="padding: 80px 48px 0">
+<div style="max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+<h2 class="h-sec" style="margin: 0; font-family: Onest, sans-serif; font-weight: 700; font-size: 34px; letter-spacing: -0.6px">${esc(v.t.featTitle)}</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 12px">
+${(v.features||[]).map(function(f){return `
+<div style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 16px; padding: 18px; display: flex; gap: 14px; align-items: center">
+<span style="width: 40px; height: 40px; border-radius: 10px; background: #E6F0F2; color: #0E5E6F; display: flex; align-items: center; justify-content: center; flex: none">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"></path></svg></span>
+<span style="font-weight: 600; line-height: 1.35">${esc(f.label)}</span>
+</div>
+`;}).join("")}
+</div>
+</div>
+</section>
+
+<section class="pad" style="padding: 80px 48px 0">
+<div style="max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap">
+<h2 class="h-sec" style="margin: 0; font-family: Onest, sans-serif; font-weight: 700; font-size: 34px; letter-spacing: -0.6px">${esc(v.t.topTitle)}</h2>
+<button class="lnk" style="color: #0E5E6F; font-weight: 600" data-h="${h(v.goRegistry)}">${esc(v.t.ctaReg)} →</button>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 18px">
+${(v.top||[]).map(function(x){return `
+<button class="cardbtn" data-h="${h(x.open)}" aria-label="${esc(x.name)}">
+<div class="card" style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 18px; overflow: hidden">
+<div style="height: 160px; background: ${esc(x.color)}; display: flex; justify-content: space-between; align-items: flex-start; padding: 12px; box-sizing: border-box">
+<span style="background: #0F2A33; color: #FFFFFF; border-radius: 8px; padding: 5px 9px; font-size: 13px; font-weight: 600">#${esc(x.rank)}</span>
+<span style="background: #FFFFFF; border-radius: 8px; padding: 5px 9px; font-size: 12px">[Фото]</span></div>
+<div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; gap: 8px"><span style="font-weight: 600; font-size: 17px">${esc(x.name)}</span><span style="font-weight: 600">★ ${esc(x.rating)}</span></div>
+<span style="color: #4A5F66; font-size: 14px">${esc(x.region)}</span>
+<span style="font-size: 14px; color: #0E5E6F; font-weight: 500">${esc(x.profilesStr)}</span>
+</div></div>
+</button>
+`;}).join("")}
+</div>
+</div>
+</section>
+
+<section class="pad" style="padding: 80px 48px 96px">
+<div style="max-width: 1240px; margin: 0 auto; background: #0E5E6F; color: #FFFFFF; border-radius: 24px; padding: 40px; display: flex; justify-content: space-between; align-items: center; gap: 24px; flex-wrap: wrap; box-sizing: border-box">
+<div style="display: flex; flex-direction: column; gap: 8px; flex: 1 1 420px">
+<span style="font-family: Onest, sans-serif; font-weight: 700; font-size: 28px">${esc(v.t.free)}</span>
+<span style="color: #D6E8EC; line-height: 1.5">Подбор, анкета и сравнение санаториев — бесплатно. Платно — только дополнительные услуги, например консультация врача.</span>
+</div>
+<button class="btn" style="background: #FFFFFF; color: #0E5E6F" data-h="${h(v.goAssistant)}">${esc(v.t.ctaStart)}</button>
+</div>
+</section>
+`:""}
+
+
+${v.isAssistant?`
+<section class="pad" style="padding: 32px 48px 120px">
+<div style="max-width: 1240px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start">
+
+<div style="flex: 999 1 560px; min-width: 0; background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 22px; overflow: hidden">
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 24px; border-bottom: 1px solid #DCE6E9; flex-wrap: wrap">
+<div style="display: flex; flex-direction: column"><span style="font-weight: 600">${esc(v.t.chatTitle)}</span><span style="font-size: 13px; color: #4A5F66">Шаг ${esc(v.stepNum)} из 7 · ${esc(v.stepName)}</span></div>
+<button class="lnk" style="color: #0E5E6F; font-weight: 600" data-h="${h(v.restart)}">Начать заново</button>
+</div>
+<div style="height: 4px; background: #E6EDEF"><div style="height: 4px; width: ${esc(v.progress)}; background: #0E5E6F"></div></div>
+
+${v.asking?`
+<div style="padding: 32px 28px; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 class="h-sec" style="margin: 0; font-family: Onest, sans-serif; font-weight: 700; font-size: 28px; letter-spacing: -0.4px; line-height: 1.2">${esc(v.cur.q)}</h1>
+<span style="color: #4A5F66; line-height: 1.5">${esc(v.cur.hint)}</span>
+</div>
+
+${v.cur.isDiag?`
+${(v.cur.groups||[]).map(function(g){return `
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-weight: 600; font-size: 14px; color: #0E5E6F; text-transform: uppercase; letter-spacing: 0.4px">${esc(g.label)}</span>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px">
+${(g.opts||[]).map(function(o){return `
+<button class="${esc(o.cls)}" style="align-items: center" data-h="${h(o.pick)}">
+<span class="${esc(o.boxCls)}">${o.on?`✓`:""}</span>
+<span style="font-weight: 500; line-height: 1.35">${esc(o.label)}</span>
+</button>
+`;}).join("")}
+</div>
+</div>
+`;}).join("")}
+<button class="opt" style="border-style: dashed; align-items: center" data-h="${h(v.addFile)}">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0E5E6F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5 12.5 21a5 5 0 0 1-7-7L14 5.5a3.3 3.3 0 0 1 4.7 4.7L10.2 18.7a1.7 1.7 0 0 1-2.4-2.4L15 9"></path></svg>
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">${esc(v.fileTitle)}</span><span style="color: #4A5F66; font-size: 14px">Необязательно · санаторно-курортная карта или выписка, увидит только врач</span></span>
+</button>
+`:""}
+
+${v.cur.notDiag?`
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px">
+${(v.cur.opts||[]).map(function(o){return `
+<button class="${esc(o.cls)}" style="min-height: 76px; align-items: center" data-h="${h(o.pick)}">
+<span class="${esc(o.boxCls)}">${o.on?`✓`:""}</span>
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600; font-size: 16px; line-height: 1.3">${esc(o.label)}</span>${o.desc?`<span style="color: #4A5F66; font-size: 13px; line-height: 1.4">${esc(o.desc)}</span>`:""}</span>
+</button>
+`;}).join("")}
+</div>
+`:""}
+
+<div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-top: 18px; border-top: 1px solid #EEF3F4">
+<button class="btn2" data-h="${h(v.cur.back)}">Назад</button>
+<button class="${esc(v.cur.nextCls)}" data-h="${h(v.cur.next)}">${esc(v.cur.nextLabel)}</button>
+</div>
+</div>
+`:""}
+
+${v.analyzing?`
+<div style="padding: 80px 28px; display: flex; flex-direction: column; gap: 16px; align-items: center; text-align: center">
+<span class="typing"><span></span><span></span><span></span></span>
+<span style="font-weight: 600; font-size: 20px">Подбираем санатории</span>
+<span style="color: #4A5F66">Сверяем ваши ответы с профилями лечения и противопоказаниями</span>
+</div>
+`:""}
+</div>
+
+<aside style="flex: 1 1 300px; max-width: 100%; display: flex; flex-direction: column; gap: 16px">
+<div style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 18px; padding: 20px; display: flex; flex-direction: column; gap: 12px">
+<span style="font-weight: 600; font-size: 17px">Ваш профиль для подбора</span>
+${(v.profileRows||[]).map(function(r){return `
+<div style="display: flex; flex-direction: column; gap: 2px; padding-bottom: 10px; border-bottom: 1px solid #EEF3F4">
+<span style="font-size: 13px; color: #4A5F66">${esc(r.label)}</span>
+<span style="font-weight: 500; font-size: 15px">${esc(r.val)}</span>
+</div>
+`;}).join("")}
+</div>
+<div style="background: #E6F0F2; border-radius: 18px; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+<span style="font-weight: 600">Сложный случай?</span>
+<span style="font-size: 14px; line-height: 1.5; color: #22383F">Врач-курортолог поможет с выбором онлайн — по видео или в чате.</span>
+<button class="btn2" style="background: #FFFFFF" data-h="${h(v.goConsultAny)}">Консультация врача</button>
+</div>
+<span style="font-size: 13px; color: #4A5F66; line-height: 1.5">Данные о здоровье используются только для подбора и хранятся в Казахстане. [Ссылка на политику обработки персональных данных]</span>
+</aside>
+</div>
+</section>
+`:""}
+
+
+${v.isResults?`
+<section class="pad" style="padding: 36px 48px 120px">
+<div style="max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px">
+<button class="lnk" style="align-self: flex-start; padding: 0" data-h="${h(v.backToChat)}">← Изменить ответы</button>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 class="h-sec" style="margin: 0; font-family: Onest, sans-serif; font-weight: 700; font-size: 36px; letter-spacing: -0.6px">Подобрали для вас ${esc(v.resCountLabel)}</h1>
+<span style="color: #4A5F66">${esc(v.summary)}</span>
+</div>
+
+${v.hasAcute?`
+<div style="background: #FCF1E6; border-radius: 14px; padding: 16px 18px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; justify-content: space-between">
+<span style="color: #5E3410; line-height: 1.5; flex: 1 1 420px"><b>Санаторное лечение проводится вне обострения.</b> Перед поездкой рекомендуем показаться врачу — можно онлайн.</span>
+<button class="btn2" style="background: #FFFFFF" data-h="${h(v.goConsultAny)}">Записаться к врачу</button>
+</div>
+`:""}
+${v.hasExcluded?`
+<div style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-weight: 600">Исключили по противопоказаниям: ${esc(v.excludedCount)}</span>
+${(v.excluded||[]).map(function(e){return `<span style="font-size: 14px; color: #4A5F66">${esc(e.name)} — ${esc(e.reason)}</span>`;}).join("")}
+</div>
+`:""}
+
+${(v.results||[]).map(function(x){return `
+<div class="card" style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 20px; overflow: hidden; display: flex; flex-wrap: wrap">
+<div style="flex: 1 1 260px; min-height: 240px; background: ${esc(x.color)}; position: relative; display: flex; align-items: flex-end; padding: 14px; box-sizing: border-box">
+<span style="background: #FFFFFF; border-radius: 8px; padding: 5px 9px; font-size: 12px">[Фото санатория]</span>
+<span style="position: absolute; top: 14px; left: 14px; background: #0F2A33; color: #FFFFFF; border-radius: 10px; padding: 8px 12px; font-weight: 600">${esc(x.badge)}</span>
+</div>
+<div style="flex: 999 1 420px; min-width: 0; padding: 22px 24px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: flex-start">
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-weight: 700; font-size: 22px; font-family: Onest, sans-serif">${esc(x.name)}</span><span style="color: #4A5F66; font-size: 14px">${esc(x.region)} · ★ ${esc(x.rating)} (${esc(x.reviews)} отзывов)</span></div>
+<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px"><span style="font-family: Onest, sans-serif; font-weight: 700; font-size: 30px; color: #0E5E6F">${esc(x.score)}%</span><span style="font-size: 13px; color: #4A5F66">совпадение</span></div>
+</div>
+<div style="background: #F2F6F7; border-radius: 14px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-weight: 600; font-size: 14px; color: #0E5E6F">Почему подходит</span>
+${(x.why||[]).map(function(w){return `
+<div style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.45"><span style="color: #0E5E6F; font-weight: 700">✓</span><span>${esc(w.text)}</span></div>
+`;}).join("")}
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap">
+<span>от <b style="font-size: 20px">${esc(x.priceStr)} ₸</b> <span style="color: #4A5F66">/ сутки с лечением</span></span>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+<button class="btn2" data-h="${h(x.open)}">Подробнее</button>
+<button class="btn" data-h="${h(x.book)}">Забронировать</button>
+</div>
+</div>
+</div>
+</div>
+`;}).join("")}
+
+<div style="display: flex; gap: 12px; align-items: flex-start; background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 14px; padding: 16px 18px">
+<span style="font-weight: 700; color: #0E5E6F">i</span>
+<span style="font-size: 14px; line-height: 1.55; color: #22383F">Подбор носит рекомендательный характер и не заменяет консультацию врача. Окончательный курс процедур назначает врач санатория при заезде.</span>
+</div>
+</div>
+</section>
+`:""}
+
+
+${v.isRegistry?`
+<section class="pad" style="padding: 36px 48px 120px">
+<div style="max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: flex-end">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 class="h-sec" style="margin: 0; font-family: Onest, sans-serif; font-weight: 700; font-size: 36px; letter-spacing: -0.6px">${esc(v.t.navReg)}</h1>
+<span style="color: #4A5F66">Единый реестр санаторно-курортных организаций Казахстана · ${esc(v.regCount)} в демо</span>
+</div>
+<button class="btn" data-h="${h(v.goAssistant)}">Подобрать с Elim-AI</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
+${(v.regChips||[]).map(function(c){return `<button class="${esc(c.cls)}" data-h="${h(c.pick)}">${esc(c.label)}</button>`;}).join("")}
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 18px">
+${(v.registry||[]).map(function(x){return `
+<button class="cardbtn" data-h="${h(x.open)}" aria-label="${esc(x.name)}">
+<div class="card" style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 18px; overflow: hidden">
+<div style="height: 150px; background: ${esc(x.color)}; display: flex; align-items: flex-end; padding: 12px; box-sizing: border-box"><span style="background: #FFFFFF; border-radius: 8px; padding: 5px 9px; font-size: 12px">[Фото]</span></div>
+<div style="padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; gap: 8px"><span style="font-weight: 600; font-size: 17px">${esc(x.name)}</span><span style="font-weight: 600">★ ${esc(x.rating)}</span></div>
+<span style="color: #4A5F66; font-size: 14px">${esc(x.region)}</span>
+<div style="display: flex; flex-wrap: wrap; gap: 6px">
+${(x.tags||[]).map(function(t){return `<span style="background: #E6F0F2; color: #0E5E6F; border-radius: 6px; padding: 4px 8px; font-size: 13px; font-weight: 500">${esc(t.label)}</span>`;}).join("")}
+</div>
+<span style="font-size: 15px">от <b>${esc(x.priceStr)} ₸</b> <span style="color: #4A5F66">/ сутки</span></span>
+</div></div>
+</button>
+`;}).join("")}
+</div>
+</div>
+</section>
+`:""}
+
+
+${v.isDetail?`
+<section class="pad" style="padding: 32px 48px 120px">
+<div style="max-width: 1240px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px">
+<button class="lnk" style="align-self: flex-start; padding: 0" data-h="${h(v.goBackFromDetail)}">← ${esc(v.backLabel)}</button>
+<div style="display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; align-items: flex-end">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 class="h-sec" style="margin: 0; font-family: Onest, sans-serif; font-weight: 700; font-size: 40px; letter-spacing: -0.8px">${esc(v.san.name)}</h1>
+<span style="color: #4A5F66">${esc(v.san.region)} · ★ ${esc(v.san.rating)} (${esc(v.san.reviews)} отзывов) · #${esc(v.san.rank)} в рейтинге</span>
+</div>
+${v.san.hasScore?`<span style="background: #0F2A33; color: #FFFFFF; border-radius: 10px; padding: 10px 14px; font-weight: 600">Совпадение с анкетой ${esc(v.san.score)}%</span>`:""}
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px">
+<div style="grid-column: span 2; grid-row: span 2; min-height: 320px; border-radius: 18px; background: ${esc(v.san.color)}; display: flex; align-items: flex-end; padding: 16px; box-sizing: border-box"><span style="background: #FFFFFF; border-radius: 8px; padding: 6px 10px; font-size: 13px">[Главное фото]</span></div>
+<div style="border-radius: 18px; background: #D9E5E8; min-height: 110px"></div>
+<div style="border-radius: 18px; background: #E5DFD6; min-height: 110px"></div>
+<div style="border-radius: 18px; background: #D6DFE6; min-height: 110px"></div>
+<div style="border-radius: 18px; background: #E1E7DD; min-height: 110px; display: flex; align-items: center; justify-content: center; font-weight: 600; color: #22383F">[+ фото и видео]</div>
+</div>
+
+<div style="display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start">
+<div style="flex: 999 1 560px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; gap: 24px; border-bottom: 1px solid #DCE6E9; flex-wrap: wrap">
+${(v.tabs||[]).map(function(tb){return `<button class="${esc(tb.cls)}" data-h="${h(tb.pick)}">${esc(tb.label)}</button>`;}).join("")}
+</div>
+
+${v.tabTreat?`
+<p style="margin: 0; line-height: 1.6; color: #22383F">[Описание санатория: расположение, природные факторы, медицинская база, лицензия, питание. Заполняется санаторием в своём кабинете и проходит модерацию платформы.]</p>
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px">
+${(v.san.treat||[]).map(function(tr){return `
+<div style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 8px">
+<span style="font-weight: 600; color: #0E5E6F; font-size: 16px">${esc(tr.label)}</span>
+<span style="font-size: 14px; line-height: 1.5">${esc(tr.procs)}</span>
+<span style="font-size: 13px; color: #4A5F66">Показания: ${esc(tr.diags)}</span>
+</div>
+`;}).join("")}
+</div>
+<div style="background: #FCF1E6; border-radius: 14px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px">
+<span style="font-weight: 600; color: #5E3410">Противопоказания</span>
+<span style="font-size: 14px; line-height: 1.5; color: #5E3410">${esc(v.san.contraStr)}</span>
+</div>
+`:""}
+
+${v.tabRooms?`
+<div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: baseline">
+<span style="font-weight: 600; font-size: 18px">Свободные номера на 15 – 25 ноября</span>
+<span style="color: #4A5F66; font-size: 14px">Цена за сутки на человека: проживание, питание, лечение</span>
+</div>
+${(v.san.rooms||[]).map(function(r){return `
+<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center; justify-content: space-between; background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 14px; padding: 16px 18px">
+<div style="display: flex; flex-direction: column; gap: 4px; flex: 1 1 260px; min-width: 0">
+<span style="font-weight: 600; font-size: 17px">${esc(r.name)}</span>
+<span style="color: #4A5F66; font-size: 14px">${esc(r.desc)}</span>
+<span class="${esc(r.leftCls)}">${esc(r.leftLabel)}</span>
+</div>
+<div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap">
+<span style="font-size: 20px; font-weight: 600">${esc(r.priceStr)} ₸</span>
+<button class="btn" data-h="${h(r.choose)}">Забронировать</button>
+</div>
+</div>
+`;}).join("")}
+`:""}
+
+${v.tabReviews?`
+<div style="display: flex; gap: 28px; flex-wrap: wrap; align-items: center; background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 16px; padding: 20px">
+<div style="display: flex; flex-direction: column; gap: 2px; align-items: center"><span style="font-family: Onest, sans-serif; font-weight: 700; font-size: 44px">${esc(v.san.rating)}</span><span style="color: #4A5F66; font-size: 14px">${esc(v.san.reviews)} отзывов</span></div>
+<div style="flex: 1 1 320px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 20px">
+${(v.scores||[]).map(function(s){return `
+<div style="display: flex; flex-direction: column; gap: 6px"><div style="display: flex; justify-content: space-between; font-size: 14px"><span>${esc(s.label)}</span><b>${esc(s.val)}</b></div>
+<div style="height: 6px; background: #E6EDEF; border-radius: 999px"><div style="height: 6px; width: ${esc(s.pct)}; background: #0E5E6F; border-radius: 999px"></div></div></div>
+`;}).join("")}
+</div>
+</div>
+${(v.reviewStubs||[]).map(function(rv){return `
+<div style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap"><span style="font-weight: 600">[Имя гостя] · ${esc(rv.profile)}</span><span style="color: #4A5F66; font-size: 14px">✓ Подтверждённая поездка</span></div>
+<span style="color: #4A5F66; line-height: 1.5">[Текст отзыва: результат лечения, процедуры, питание, персонал]</span>
+</div>
+`;}).join("")}
+<span style="font-size: 13px; color: #4A5F66">Оставить отзыв можно только после завершённой поездки, оформленной через Elim-AI.</span>
+`:""}
+
+${v.tabDoctors?`
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px">
+${(v.doctors||[]).map(function(d){return `
+<div style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 16px; padding: 18px; display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; gap: 12px; align-items: center"><span style="width: 48px; height: 48px; border-radius: 999px; background: #D9E5E8; flex: none"></span>
+<div style="display: flex; flex-direction: column"><span style="font-weight: 600">[ФИО врача]</span><span style="font-size: 14px; color: #4A5F66">${esc(d.spec)}</span></div></div>
+<button class="btn2" data-h="${h(d.consult)}">Онлайн-консультация</button>
+</div>
+`;}).join("")}
+</div>
+`:""}
+</div>
+
+<aside style="flex: 1 1 300px; max-width: 100%; background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 14px; box-sizing: border-box">
+<span>от <b style="font-size: 26px">${esc(v.san.priceStr)} ₸</b> / сутки</span>
+<div class="field" style="flex: none"><label for="d-d">Даты</label><input id="d-d" type="text" value="15 – 25 ноября 2026 · 10 ночей" readonly></div>
+<div class="field" style="flex: none"><label for="d-g">Гостей</label><input id="d-g" type="text" value="${esc(v.guestsLabel)}" readonly></div>
+<button class="btn" data-h="${h(v.showRooms)}">Выбрать номер</button>
+<button class="btn2" data-h="${h(v.goConsultAny)}">Спросить врача</button>
+<span style="color: #4A5F66; font-size: 13px; line-height: 1.5">Бесплатная отмена до подтверждения санаторием. Условия возврата после оплаты — [указать].</span>
+</aside>
+</div>
+</div>
+</section>
+`:""}
+
+
+${v.isConsult?`
+<section class="pad" style="padding: 36px 48px 120px">
+<div style="max-width: 980px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 class="h-sec" style="margin: 0; font-family: Onest, sans-serif; font-weight: 700; font-size: 36px; letter-spacing: -0.6px">Онлайн-консультация врача</h1>
+<span style="color: #4A5F66; line-height: 1.5">Врач-курортолог изучит ваши жалобы и документы, подтвердит показания и поможет выбрать санаторий и программу лечения.</span>
+</div>
+
+${v.consultForm?`
+<div style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-weight: 600; font-size: 18px">1. Специалист</span>
+${(v.doctorsPick||[]).map(function(d){return `
+<button class="${esc(d.cls)}" style="align-items: center" data-h="${h(d.pick)}">
+<span style="width: 44px; height: 44px; border-radius: 999px; background: #D9E5E8; flex: none"></span>
+<span style="display: flex; flex-direction: column; gap: 2px; flex: 1"><span style="font-weight: 600">[ФИО врача] — ${esc(d.spec)}</span><span style="color: #4A5F66; font-size: 14px">Стаж [—] лет · ★ [рейтинг]</span></span>
+<span style="font-weight: 600; white-space: nowrap">[цена] ₸</span>
+</button>
+`;}).join("")}
+</div>
+<div style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-weight: 600; font-size: 18px">2. Формат и время</span>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">
+${(v.formats||[]).map(function(f){return `<button class="${esc(f.cls)}" data-h="${h(f.pick)}">${esc(f.label)}</button>`;}).join("")}
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-size: 14px; color: #4A5F66">Сегодня, 4 октября</span>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">${(v.slotsToday||[]).map(function(s){return `<button class="${esc(s.cls)}" data-h="${h(s.pick)}">${esc(s.label)}</button>`;}).join("")}</div>
+<span style="font-size: 14px; color: #4A5F66; margin-top: 6px">Завтра, 5 октября</span>
+<div style="display: flex; gap: 8px; flex-wrap: wrap">${(v.slotsTomorrow||[]).map(function(s){return `<button class="${esc(s.cls)}" data-h="${h(s.pick)}">${esc(s.label)}</button>`;}).join("")}</div>
+</div>
+</div>
+<div style="display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap">
+<span style="color: #4A5F66; font-size: 14px">Платная услуга · оплата Kaspi или картой</span>
+<button class="${esc(v.consultBtnCls)}" data-h="${h(v.confirmConsult)}">Записаться и оплатить</button>
+</div>
+`:""}
+
+${v.consultDone?`
+<div style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 16px">
+<div style="width: 56px; height: 56px; border-radius: 999px; background: #E6F0F2; display: flex; align-items: center; justify-content: center">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0E5E6F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"></path></svg></div>
+<span style="font-family: Onest, sans-serif; font-weight: 700; font-size: 26px">Вы записаны: ${esc(v.slotLabel)}</span>
+<span style="color: #22383F; line-height: 1.6">${esc(v.consultDoneText)} Ссылка на звонок и напоминание придут по SMS. Ответы из анкеты Elim-AI врач увидит заранее.</span>
+<div style="display: flex; gap: 12px; flex-wrap: wrap"><button class="btn" data-h="${h(v.goResultsOrAssistant)}">Вернуться к подбору</button><button class="btn2" data-h="${h(v.goHome)}">На главную</button></div>
+</div>
+`:""}
+</div>
+</section>
+`:""}
+
+
+${v.isBook?`
+<section class="pad" style="padding: 32px 48px 120px">
+<div style="max-width: 1100px; margin: 0 auto; display: flex; flex-direction: column; gap: 22px">
+<button class="lnk" style="align-self: flex-start; padding: 0" data-h="${h(v.backToDetail)}">← Назад к санаторию</button>
+<h1 class="h-sec" style="margin: 0; font-family: Onest, sans-serif; font-weight: 700; font-size: 34px; letter-spacing: -0.5px">Бронирование путёвки</h1>
+<div style="display: flex; flex-wrap: wrap; gap: 28px; align-items: flex-start">
+<div style="flex: 999 1 520px; min-width: 0; display: flex; flex-direction: column; gap: 20px">
+<div style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 14px">
+<span style="font-weight: 600; font-size: 18px">Данные гостя</span>
+<div style="display: flex; gap: 14px; flex-wrap: wrap">
+<div class="field"><label for="b-n">Фамилия и имя</label><input id="b-n" type="text" placeholder="Как в удостоверении"></div>
+<div class="field"><label for="b-i">ИИН</label><input id="b-i" type="text" placeholder="12 цифр"></div>
+</div>
+<div style="display: flex; gap: 14px; flex-wrap: wrap">
+<div class="field"><label for="b-p">Телефон</label><input id="b-p" type="tel" placeholder="+7 (___) ___-__-__"></div>
+<div class="field"><label for="b-e">Email</label><input id="b-e" type="email" placeholder="для путёвки и чека"></div>
+</div>
+<button class="opt" style="border-style: dashed; align-items: center" data-h="${h(v.addFile)}">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0E5E6F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.5 12.5 21a5 5 0 0 1-7-7L14 5.5a3.3 3.3 0 0 1 4.7 4.7L10.2 18.7a1.7 1.7 0 0 1-2.4-2.4L15 9"></path></svg>
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">${esc(v.fileTitle)}</span><span style="color: #4A5F66; font-size: 14px">Санаторно-курортная карта · передаётся только врачу санатория</span></span>
+</button>
+</div>
+<div style="background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 12px">
+<span style="font-weight: 600; font-size: 18px">Оплата онлайн</span>
+${(v.pays||[]).map(function(p){return `
+<button class="${esc(p.cls)}" style="align-items: center" data-h="${h(p.pick)}">
+<span style="width: 22px; height: 22px; border-radius: 999px; border: 2px solid #0E5E6F; flex: none; display: flex; align-items: center; justify-content: center">${p.on?`<span style="width: 10px; height: 10px; border-radius: 999px; background: #0E5E6F"></span>`:""}</span>
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">${esc(p.title)}</span><span style="color: #4A5F66; font-size: 14px">${esc(p.desc)}</span></span>
+</button>
+`;}).join("")}
+<label style="display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.5; color: #22383F; padding-top: 4px"><input type="checkbox" ${v.consent?"checked":""} data-h="${h(v.toggleConsent)}" style="width: 20px; height: 20px; margin: 0; flex: none"> Согласен на обработку персональных и медицинских данных и с условиями бронирования</label>
+</div>
+</div>
+<aside style="flex: 1 1 320px; max-width: 100%; background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 18px; overflow: hidden; box-sizing: border-box">
+<div style="height: 110px; background: ${esc(v.san.color)}"></div>
+<div style="padding: 22px; display: flex; flex-direction: column; gap: 12px">
+<span style="font-weight: 600; font-size: 18px">${esc(v.san.name)}</span>
+<span style="color: #4A5F66; font-size: 14px">${esc(v.san.region)}</span>
+<div style="display: flex; flex-direction: column; gap: 8px; border-top: 1px solid #DCE6E9; padding-top: 12px; font-size: 15px">
+<div style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #4A5F66">Номер</span><span style="text-align: right">${esc(v.room.name)}</span></div>
+<div style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #4A5F66">Даты</span><span>15 – 25 ноября</span></div>
+<div style="display: flex; justify-content: space-between; gap: 12px; align-items: center"><span style="color: #4A5F66">Гостей</span>
+<span style="display: flex; align-items: center; gap: 10px"><button class="step" data-h="${h(v.guestMinus)}" aria-label="Меньше гостей">−</button><b>${esc(v.guests)}</b><button class="step" data-h="${h(v.guestPlus)}" aria-label="Больше гостей">+</button></span></div>
+<div style="display: flex; justify-content: space-between; gap: 12px"><span style="color: #4A5F66">${esc(v.room.priceStr)} ₸ × 10 ночей × ${esc(v.guests)}</span><span>${esc(v.totalStr)} ₸</span></div>
+</div>
+<div style="display: flex; justify-content: space-between; border-top: 1px solid #DCE6E9; padding-top: 12px"><span style="font-weight: 600; font-size: 18px">Итого</span><span style="font-weight: 700; font-size: 22px">${esc(v.totalStr)} ₸</span></div>
+<button class="${esc(v.payCls)}" data-h="${h(v.submit)}">Отправить заявку</button>
+<span style="color: #4A5F66; font-size: 13px; line-height: 1.5">Санаторий подтвердит наличие номера, затем придёт ссылка на оплату. До подтверждения деньги не списываются.</span>
+</div>
+</aside>
+</div>
+</div>
+</section>
+`:""}
+
+
+${v.isDone?`
+<section class="pad" style="padding: 64px 48px 140px">
+<div style="max-width: 720px; margin: 0 auto; background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 22px; padding: 40px; display: flex; flex-direction: column; gap: 20px; box-sizing: border-box">
+<div style="width: 56px; height: 56px; border-radius: 999px; background: #E6F0F2; display: flex; align-items: center; justify-content: center">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0E5E6F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 5 5L20 7"></path></svg></div>
+<h1 class="h-sec" style="margin: 0; font-family: Onest, sans-serif; font-weight: 700; font-size: 30px; letter-spacing: -0.5px">Заявка № EL-20431 отправлена</h1>
+<p style="margin: 0; color: #22383F; line-height: 1.6; font-size: 17px">${esc(v.san.name)} подтвердит наличие номера, обычно в течение 2 часов. Ссылку на оплату (${esc(v.payTitle)}) пришлём по SMS и на email.</p>
+<div style="display: flex; flex-direction: column">
+${(v.timeline||[]).map(function(t){return `
+<div style="display: flex; gap: 14px; align-items: flex-start; padding: 10px 0">
+<span class="${esc(t.dot)}"></span>
+<span style="display: flex; flex-direction: column; gap: 2px"><span style="font-weight: 600">${esc(t.title)}</span><span style="color: #4A5F66; font-size: 14px">${esc(t.desc)}</span></span>
+</div>
+`;}).join("")}
+</div>
+<div style="display: flex; gap: 12px; flex-wrap: wrap"><button class="btn">Личный кабинет</button><button class="btn2" data-h="${h(v.goHome)}">На главную</button></div>
+</div>
+</section>
+`:""}
+
+<footer class="pad" style="background: #0F2A33; color: #C5D4D8; padding: 40px 48px">
+<div style="max-width: 1240px; margin: 0 auto; display: flex; justify-content: space-between; gap: 24px; flex-wrap: wrap; font-size: 14px">
+<span style="font-family: Onest, sans-serif; font-weight: 700; font-size: 18px; color: #FFFFFF">Elim-AI</span>
+<span>[Юр. лицо] · [Контакты] · Поддержка 24/7</span>
+<span>Kaspi · Visa · Mastercard</span>
+</div>
+</footer>
+
+
+<div style="position: fixed; right: 20px; bottom: 20px; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; z-index: 10">
+${v.supportOpen?`
+<div style="width: 320px; max-width: calc(100vw - 40px); background: #FFFFFF; border: 1px solid #DCE6E9; border-radius: 18px; box-shadow: 0 16px 40px rgba(15,42,51,.18); overflow: hidden">
+<div style="background: #0F2A33; color: #FFFFFF; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center">
+<span style="font-weight: 600">Поддержка 24/7</span>
+<button class="lnk" style="color: #FFFFFF; min-height: 32px; padding: 0 6px" data-h="${h(v.toggleSupport)}" aria-label="Закрыть">✕</button></div>
+<div style="padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+<div style="background: #F2F6F7; border-radius: 4px 14px 14px 14px; padding: 10px 12px; font-size: 14px; line-height: 1.45">Здравствуйте! Оператор на связи. Чем помочь?</div>
+<button class="chip chip-sm" data-h="${h(v.toggleSupport)}">Статус моей заявки</button>
+<button class="chip chip-sm" data-h="${h(v.toggleSupport)}">Изменить даты</button>
+<button class="chip chip-sm" data-h="${h(v.toggleSupport)}">Вопрос по оплате</button>
+<span style="font-size: 13px; color: #4A5F66">Также: WhatsApp, Telegram, [номер телефона]</span>
+</div>
+</div>
+`:""}
+<button class="btn" style="border-radius: 999px; box-shadow: 0 8px 24px rgba(15,42,51,.25)" data-h="${h(v.toggleSupport)}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"></path></svg>
+<span class="hide-sm">Поддержка 24/7</span></button>
+</div>
+</div>
+`;}
+function __render(){
+  var app=document.getElementById("app"), keep={};
+  app.querySelectorAll("input[id]:not([readonly])").forEach(function(i){ if(i.type!=="checkbox") keep[i.id]=i.value; });
+  __H=[];
+  app.innerHTML=view(__comp.renderVals());
+  Object.keys(keep).forEach(function(id){ var el=document.getElementById(id); if(el) el.value=keep[id]; });
+}
+document.addEventListener("click",function(e){ var el=e.target.closest("[data-h]"); if(el&&el.tagName!=="INPUT"){ var f=__H[+el.getAttribute("data-h")]; if(f) f(e); } });
+document.addEventListener("change",function(e){ var el=e.target; if(el.matches&&el.matches("input[data-h]")){ var f=__H[+el.getAttribute("data-h")]; if(f) f(e); } });
+__comp=new Component({});
+__render();
+</script>
+</body>
+</html>
